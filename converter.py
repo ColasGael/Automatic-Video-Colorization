@@ -1,28 +1,65 @@
-import numpy as np
 import os
+import argparse
+
+import numpy as np
 import cv2
 
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--filename', type=str, default='*', help='Filename of input video')
+    parser.add_argument('--input_dir', type=str, default='data/raw/', help='Directory of input files')
+    parser.add_argument('--output_dir', type=str, default='data/converted/', help='Directory of output files')
+    parser.add_argument('--out_dim', type=str, default=None, help='Dimensions of output frames (width, height)')
+    parser.add_argument('--fps', type=int, default=None, help='Number of fps of output files')
 
-for filename in os.listdir("data/raw"):
-    if filename.endswith(".mp4"):
+    args = parser.parse_args()
+    return args
 
-        cap = cv2.VideoCapture("data/raw/" + filename)
-
+def parse_config(args):
+    with open('config.yml', 'r') as f:
+        config = yaml.load(f)
+    if not os.path.exists(args.log_dir):
+        os.makedirs(args.log_dir)
+    with open(os.path.join(args.log_dir, 'config.yml'), 'w') as f:
+        yaml.dump(config, f, default_flow_style=False)
+    return dict2namespace(config)
+    
+def color2bw(inputname, inputpath = 'data/raw/', outputpath = 'data/converted/', out_dim = (None, None), fps = None):
+    if inputname.endswith(".mp4"):
+        
+        # store informations about the original video
+        cap = cv2.VideoCapture(inputpath + inputname)
+        # original dimensions
+        width, height = int(cap.get(3)), int(cap.get(4))
+        
         fourcc = cv2.VideoWriter_fourcc(*'mp4v');
-        fps = 30.0
+        
+        # parameters of output file
+        if out_dim == None:
+            # dimensions of the output image
+            new_width, new_height = width, height
+        else:
+            new_width, new_height = int(out_dim[1]), int(out_dim[3])
+        if fps == None:
+            # number of frames
+            fps = 30.0
+           
+        # output video
         out = cv2.VideoWriter(
-            "data/converted/bw_" + filename,
+            outputpath + 'bw_' + inputname,
             fourcc,
             fps,
-            (int(cap.get(3)),int(cap.get(4))),
+            (new_width, new_height),
             isColor=False
         )
 
 
         while(cap.isOpened()):
             ret, frame = cap.read()
+            # check if we are not at the end of the video
             if ret==True:
-                # Our operations on the frame come here
+                # operations on the frame come here
+                    # change color to BW
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                 
                 # write the grayscaled frame
@@ -30,10 +67,27 @@ for filename in os.listdir("data/raw"):
                 
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                     break
+            # end of the video
             else:
                 break
 
-        # Release everything if job is finished
+        # release everything if job is finished
         cap.release()
         out.release()
-cv2.destroyAllWindows()
+
+def main():
+    args = parse_args()
+
+    if args.filename == '*':
+        for filename in os.listdir(args.input_dir):
+            color2bw(inputname = filename, inputpath = args.input_dir, outputpath = args.output_dir, out_dim = args.out_dim, fps = args.fps)
+    else:
+        color2bw(inputname = args.filename, inputpath = args.input_dir, outputpath = args.output_dir, out_dim = args.out_dim, fps = args.fps)
+        
+    # cleanup
+    cv2.destroyAllWindows()
+
+    return 0
+
+if __name__ == '__main__':
+    main()

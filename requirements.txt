@@ -1,0 +1,2 @@
+numpy
+opencv-python		# to convert color to grayscale video clips
