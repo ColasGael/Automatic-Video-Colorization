@@ -9,7 +9,7 @@ def parse_args():
     parser.add_argument('--filename', type=str, default='*', help='Filename of input video')
     parser.add_argument('--input_dir', type=str, default='data/raw/', help='Directory of input files')
     parser.add_argument('--output_dir', type=str, default='data/converted/', help='Directory of output files')
-    parser.add_argument('--out_dim', type=str, default=None, help='Dimensions of output frames (width, height)')
+    parser.add_argument('--out_dim', type=int, nargs=2, default=None, help='Dimensions of output frames (width, height)')
     parser.add_argument('--fps', type=int, default=None, help='Number of fps of output files')
 
     args = parser.parse_args()
@@ -31,6 +31,7 @@ def color2bw(inputname, inputpath = 'data/raw/', outputpath = 'data/converted/',
         cap = cv2.VideoCapture(inputpath + inputname)
         # original dimensions
         width, height = int(cap.get(3)), int(cap.get(4))
+
         
         fourcc = cv2.VideoWriter_fourcc(*'mp4v');
         
@@ -39,18 +40,27 @@ def color2bw(inputname, inputpath = 'data/raw/', outputpath = 'data/converted/',
             # dimensions of the output image
             new_width, new_height = width, height
         else:
-            new_width, new_height = int(out_dim[1]), int(out_dim[3])
+            new_width, new_height = out_dim
         if fps == None:
             # number of frames
             fps = 30.0
-           
-        # output video
-        out = cv2.VideoWriter(
+    
+        # grayscale output video
+        gray_out = cv2.VideoWriter(
             outputpath + 'bw_' + inputname,
             fourcc,
             fps,
             (new_width, new_height),
             isColor=False
+        )
+        
+        # color output video
+        color_out = cv2.VideoWriter(
+            outputpath + 'color_' + inputname,
+            fourcc,
+            fps,
+            (new_width, new_height),
+            isColor=True
         )
 
 
@@ -58,12 +68,18 @@ def color2bw(inputname, inputpath = 'data/raw/', outputpath = 'data/converted/',
             ret, frame = cap.read()
             # check if we are not at the end of the video
             if ret==True:
-                # operations on the frame come here
-                    # change color to BW
+                
+                #resize frame
+                frame = cv2.resize(frame, (new_width, new_height), interpolation = cv2.INTER_LINEAR)
+                
+                # write the color frame
+                color_out.write(frame)
+                
+                # change color to BW
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                 
                 # write the grayscaled frame
-                out.write(frame)
+                gray_out.write(frame)
                 
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                     break
@@ -73,7 +89,8 @@ def color2bw(inputname, inputpath = 'data/raw/', outputpath = 'data/converted/',
 
         # release everything if job is finished
         cap.release()
-        out.release()
+        gray_out.release()
+        color_out.release()
 
 def main():
     args = parse_args()

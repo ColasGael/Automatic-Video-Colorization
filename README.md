@@ -19,6 +19,11 @@ For one specific video 'filename'
 python3 converter.py --inputname filename
 ```
 
+To convert all videos in the data/raw folder to a consistent fps and resolution:
+```
+python3 converter.py --fps 30 --out_dim 640 360
+```
+
 ## Requirements
 
 ### Dependencies
