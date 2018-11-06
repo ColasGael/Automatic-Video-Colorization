@@ -1,6 +1,12 @@
+# python version : 3.6
+
 numpy
 scipy
+
 matplotlib
 
 scikit-image             # to convert color images from RGB to LAB color space
 opencv-python		# to convert color to grayscale video clips
+
+# automatic image colorization
+# caffe : sudo apt install caffe-cuda
