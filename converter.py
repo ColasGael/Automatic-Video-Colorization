@@ -24,7 +24,7 @@ def parse_config(args):
         yaml.dump(config, f, default_flow_style=False)
     return dict2namespace(config)
     
-def color2bw(inputname, inputpath = 'data/raw/', outputpath = 'data/converted/', out_dim = (None, None), fps = None):
+def color2bw(inputname, inputpath, outputpath, out_dim, fps):
     if inputname.endswith(".mp4"):
         
         # store informations about the original video
