@@ -14,7 +14,7 @@ def parse_args():
     parser.add_argument('--input_dir', type=str, default='data/converted/', help='Directory of input files')
     parser.add_argument('--output_dir', type=str, default='data/recolorized/', help='Directory of output files')
     parser.add_argument('--gpu', dest='gpu', help='gpu id', type=int, default=0)
-    parser.add_argument('--prototxt',dest='prototxt',help='prototxt filepath', type=str, default='./models/colorization_deploy_v2.prototxt')
+    parser.add_argument('--prototxt',dest='prototxt',help='prototxt filepath', type=str, default='.colorization/colorization/models/colorization_deploy_v2.prototxt')
     parser.add_argument('--caffemodel',dest='caffemodel',help='caffemodel filepath', type=str, default='./models/colorization_release_v2.caffemodel')
 
     args = parser.parse_args()
