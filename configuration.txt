@@ -1,0 +1,31 @@
+# AWS instance : ec2 p2.xlarge
+# ubuntu version : 18.04 (64 bits)
+# python version : 3.6
+
+# Conda installation
+    # Nvidia drivers
+sudo apt install ubuntu-drivers-common
+# CHECK : ubuntu-drivers devices
+sudo ubuntu-drivers autoinstall
+# CHECK : nvidia-smi
+    # CUDA
+sudo apt install nvidia-cuda-toolkit
+    # CuDNN
+        # register at nvidia developers https://developer.nvidia.com/cudnn 
+        # download the corresponding runtime library (DEB)
+sudo apt install \path\<name>.deb
+ 
+# REBOOT instance
+ 
+# Automatic Image Colorization
+    # GitHUb repo cloning
+git clone -b master --single-branch https://github.com/richzhang/colorization.git
+    # download model
+./models/fetch_release_models.sh
+
+# Caffe (DL framework used in repo) installation
+sudo apt install caffe-cuda
+
+# Image visualisation
+sudo apt install eog
+# EXEMPLE : eog image.jpg
