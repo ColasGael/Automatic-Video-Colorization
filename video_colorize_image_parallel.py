@@ -4,6 +4,7 @@ import argparse
 
 import cv2
 import numpy as np
+from skimage import img_as_float
 import skimage.color as color
 import scipy.ndimage.interpolation as sni
 import caffe
@@ -14,7 +15,7 @@ def parse_args():
     parser.add_argument('--input_dir', type=str, default='data/converted/', help='Directory of input files')
     parser.add_argument('--output_dir', type=str, default='data/recolorized/', help='Directory of output files')
     parser.add_argument('--gpu', dest='gpu', help='gpu id', type=int, default=0)
-    parser.add_argument('--prototxt',dest='prototxt',help='prototxt filepath', type=str, default='.colorization/colorization/models/colorization_deploy_v2.prototxt')
+    parser.add_argument('--prototxt',dest='prototxt',help='prototxt filepath', type=str, default='./models/colorization_deploy_v2.prototxt')
     parser.add_argument('--caffemodel',dest='caffemodel',help='caffemodel filepath', type=str, default='./models/colorization_release_v2.caffemodel')
 
     args = parser.parse_args()
@@ -36,7 +37,7 @@ def image_colorization(frame, args):
 	# print 'Annealed-Mean Parameters populated'
 
 	# load the original image
-	img_rgb = frame
+	img_rgb = img_as_float(frame).astype(np.float32)
 
 	img_lab = color.rgb2lab(img_rgb) # convert image to lab color space
 	img_l = img_lab[:,:,0] # pull out L channel
@@ -70,7 +71,6 @@ def bw2color(args, inputname, inputpath, outputpath):
         # original dimensions
         width, height = int(cap.get(3)), int(cap.get(4))
 
-        
         fourcc = cv2.VideoWriter_fourcc(*'mp4v');
         
         # parameters of output file
@@ -87,17 +87,19 @@ def bw2color(args, inputname, inputpath, outputpath):
             (new_width, new_height),
             isColor=True
         )
-
+        
         while(cap.isOpened()):
-            ret, frame = cap.read()
+            ret, frame_in = cap.read()
             # check if we are not at the end of the video
-            if ret==True:
-                
-                #resize frame
-                frame = image_colorization(frame, args)
-                
+            if ret==True:                
+                # convert BGR to RGB convention
+                frame_in = frame_in[:,:,::-1]
+                # colorize the BW frame
+                frame_out = image_colorization(frame_in, args)
+                # convert RGB to BGR convention
+                frame_out = frame_out[:,:,::-1]
                 # write the color frame
-                color_out.write(frame)
+                color_out.write(frame_out)
                 
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                     break
@@ -107,7 +109,6 @@ def bw2color(args, inputname, inputpath, outputpath):
 
         # release everything if job is finished
         cap.release()
-        gray_out.release()
         color_out.release()
 
 def main():
