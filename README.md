@@ -24,7 +24,18 @@ To convert all videos in the data/raw folder to a consistent fps and resolution:
 python3 converter.py --fps 30 --out_dim 640 360
 ```
 
-## Requirements
+#### Moments in Time (Mini) Dataset
+Download and unzip the dataset
+```
+wget http://data.csail.mit.edu/soundnet/actions3/split1/Moments_in_Time_Mini.zip
+unzip Moments_in_Time_Mini.zip -d data/.
+```
+Pre-process the dataset
+```
+./convert_moment_dataset.sh
+```
+
+### Requirements
 
 ### Dependencies
 
