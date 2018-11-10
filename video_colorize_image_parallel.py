@@ -1,5 +1,5 @@
+import os
 import sys
-sys.path.append('~/colorization/colorization')
 import argparse
 
 import cv2
