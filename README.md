@@ -48,3 +48,17 @@ python3 video_colorize_image_parallel.py --filename <BW_video_filename> --input_
 ### Dependencies
 
 You can install Python dependencies using `pip install -r requirements.txt`
+
+
+### Issues with CUDA
+
+When running `import tensorflow as tf`, if you encounter the following error:
+```
+ImportError: libcublas.so.9.0: cannot open shared object file: No such file or directory
+```
+
+Run the following to create links:
+```
+sudo ln -s /usr/lib/x86_64-linux-gnu/libcublas.so.9.1.85 /usr/lib/x86_64-linux-gnu/libcublas.so.9.0
+sudo ln -s /usr/lib/x86_64-linux-gnu/libcusolver.so.9.1.85 /usr/lib/x86_64-linux-gnu/libcusolver.so.9.0
+```
