@@ -9,7 +9,7 @@ import tensorflow as tf
 from tensorflow import keras
 from abc import abstractmethod
 from networks import Generator, Discriminator
-from dataset import Places365Dataset, Cifar10Dataset
+from dataset import Places365Dataset, Cifar10Dataset, MomentsInTimeDataset
 from ops import pixelwise_accuracy, preprocess, postprocess
 from ops import COLORSPACE_RGB, COLORSPACE_LAB
 from utils import stitch_images, turing_test, imshow, visualize
