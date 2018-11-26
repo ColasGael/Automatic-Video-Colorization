@@ -56,7 +56,7 @@ class BaseModel:
                 self.sess.run([self.gen_train, self.accuracy], feed_dict=feed_dic)
                 self.sess.run([self.gen_train, self.accuracy], feed_dict=feed_dic)
 
-                print(gen_factory.var_list)
+                print(self.create_generator().var_list)
                 
                 lossD, lossD_fake, lossD_real, lossG, lossG_l1, lossG_gan, acc, step = self.eval_outputs(feed_dic=feed_dic)
 
