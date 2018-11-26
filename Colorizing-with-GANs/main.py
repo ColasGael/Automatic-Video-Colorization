@@ -4,7 +4,7 @@ import numpy as np
 import tensorflow as tf
 from options import ModelOptions
 from models import Cifar10Model, Places365Model
-from dataset import CIFAR10_DATASET, PLACES365_DATASET
+from dataset import CIFAR10_DATASET, PLACES365_DATASET, MOMENTSINTIME_DATASET
 
 
 def main(options):
@@ -27,6 +27,9 @@ def main(options):
 
         elif options.dataset == PLACES365_DATASET:
             model = Places365Model(sess, options)
+        
+        elif options.dataset == MOMENTSINTIME_DATASET:
+            model = MomentsInTimeModel(sess, options)
 
         if not os.path.exists(options.checkpoints_path):
             os.makedirs(options.checkpoints_path)
