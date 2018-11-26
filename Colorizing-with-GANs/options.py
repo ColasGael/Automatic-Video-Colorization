@@ -60,7 +60,7 @@ class ModelOptions:
         if opt.seed == 0:
             opt.seed = random.randint(0, 2**31 - 1)
 
-        if opt.dataset_path == './dataset':
+        if (opt.dataset_path == './data') or (opt.dataset_path == './dataset'):
             opt.dataset_path += ('/' + opt.dataset)
 
         if opt.checkpoints_path == './checkpoints':
