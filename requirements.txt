@@ -2,7 +2,7 @@ numpy
 scipy
 
 matplotlib
+pillow
 
-scikit-image             # to convert color images from RGB to LAB color space
-opencv-python		# to convert color to grayscale video clips
-
+scikit-image        # to convert color images from RGB to LAB color space
+opencv-python		# to read video clips

@@ -43,14 +43,13 @@ class BaseModel:
 
             self.epoch = epoch + 1
             self.iteration = 0
-
             
             generator = self.dataset_train.generator(self.options.batch_size)
             progbar = keras.utils.Progbar(total, stateful_metrics=['epoch', 'iteration', 'step'])
             
             for input_rgb in generator:
-                
-                feed_dic = {self.input_rgb: input_rgb[:,:,:,0:3], self.input_rgb_t1: input_rgb[:,:,:,3:6]}
+                # OLD : feed_dict = {self.input_rgb: input_rgb}
+                feed_dic = {self.input_rgb: input_rgb[:,:,:,0:3], self.input_rgb_prev: input_rgb[:,:,:,3:6]}
 
                 self.iteration = self.iteration + 1
                 self.sess.run([self.dis_train], feed_dict=feed_dic)
@@ -104,8 +103,8 @@ class BaseModel:
         result = []
 
         for input_rgb in test_generator:
-            #feed_dic = {self.input_rgb: input_rgb}
-            feed_dic = {self.input_rgb: input_rgb[:,:,:,0:3], self.input_rgb_t1: input_rgb[:,:,:,3:6]}
+            # OLD : feed_dic = {self.input_rgb: input_rgb}
+            feed_dic = {self.input_rgb: input_rgb[:,:,:,0:3], self.input_rgb_prev: input_rgb[:,:,:,3:6]}
 
             self.sess.run([self.dis_loss, self.gen_loss, self.accuracy], feed_dict=feed_dic)
 
@@ -129,12 +128,15 @@ class BaseModel:
         self.build()
 
         input_rgb = next(self.sample_generator)
-        feed_dic = {self.input_rgb: input_rgb[:,:,:,0:3], self.input_rgb_t1: input_rgb[:,:,:,3:6]}
-        #feed_dic = {self.input_rgb: input_rgb}
+        
+        # OLD : feed_dic = {self.input_rgb: input_rgb}
+        feed_dic = {self.input_rgb: input_rgb[:,:,:,0:3], self.input_rgb_prev: input_rgb[:,:,:,3:6]}
 
         step, rate = self.sess.run([self.global_step, self.learning_rate])
         fake_image, input_gray = self.sess.run([self.sampler, self.input_gray], feed_dict=feed_dic)
         fake_image = postprocess(tf.convert_to_tensor(fake_image), colorspace_in=self.options.color_space, colorspace_out=COLORSPACE_RGB)
+        
+        # OLD : img = stitch_images(input_gray, input_rgb, fake_image.eval())
         img = stitch_images(input_gray, input_rgb[:,:,:,3:6], fake_image.eval())
 
         if not os.path.exists(self.samples_dir):
@@ -156,8 +158,9 @@ class BaseModel:
 
         while count < self.options.test_size:
             input_rgb = next(gen)
-            #feed_dic = {self.input_rgb: input_rgb}
-            feed_dic = {self.input_rgb: input_rgb[:,:,:,0:3], self.input_rgb_t1: input_rgb[:,:,:,3:6]}
+            
+            # OLD : feed_dic = {self.input_rgb: input_rgb}
+            feed_dic = {self.input_rgb: input_rgb[:,:,:,0:3], self.input_rgb_prev: input_rgb[:,:,:,3:6]}
             fake_image = self.sess.run(self.sampler, feed_dict=feed_dic)
             fake_image = postprocess(tf.convert_to_tensor(fake_image), colorspace_in=self.options.color_space, colorspace_out=COLORSPACE_RGB)
 
@@ -180,11 +183,11 @@ class BaseModel:
         kernel = self.options.kernel_size
 
         self.input_rgb = tf.placeholder(tf.float32, shape=(None, None, None, 3), name='input_rgb')
-        self.input_rgb_t1 = tf.placeholder(tf.float32, shape=(None, None, None, 3), name='input_rgb_t1')
+        self.input_rgb_prev = tf.placeholder(tf.float32, shape=(None, None, None, 3), name='input_rgb_prev')
 
         self.input_gray = tf.image.rgb_to_grayscale(self.input_rgb)
         self.input_color = preprocess(self.input_rgb, colorspace_in=COLORSPACE_RGB, colorspace_out=self.options.color_space)
-        self.input_color_t1 = preprocess(self.input_rgb_t1, colorspace_in=COLORSPACE_RGB, colorspace_out=self.options.color_space)
+        self.input_color_t1 = preprocess(self.input_rgb_prev, colorspace_in=COLORSPACE_RGB, colorspace_out=self.options.color_space)
 
         gen = gen_factory.create(tf.concat([self.input_gray, self.input_color_t1],3), kernel, seed)
         dis_real = dis_factory.create(tf.concat([self.input_color, self.input_color_t1], 3), kernel, seed)
@@ -199,7 +202,7 @@ class BaseModel:
         self.dis_loss = tf.reduce_mean(dis_real_ce + dis_fake_ce)
 
         self.gen_loss_gan = tf.reduce_mean(gen_ce)
-        #self.gen_loss_l1 = tf.reduce_mean(tf.abs(self.input_color - gen)) * self.options.l1_weight
+        # OLD : self.gen_loss_l1 = tf.reduce_mean(tf.abs(self.input_color - gen)) * self.options.l1_weight
         self.gen_loss_l1 = tf.reduce_mean(tf.abs(self.input_gray - tf.image.rgb_to_grayscale(gen))) * self.options.l1_weight
 
         self.gen_loss = self.gen_loss_l1 #self.gen_loss_gan + self.gen_loss_l1
@@ -357,6 +360,53 @@ class Places365Model(BaseModel):
 
     def create_dataset(self, training=True):
         return Places365Dataset(
+            path=self.options.dataset_path,
+            training=training,
+            augment=self.options.augment)
+
+class MomentsInTimeModel(BaseModel):
+    def __init__(self, sess, options):
+        super(MomentsInTimeModel, self).__init__(sess, options)
+
+    def create_generator(self):
+        kernels_gen_encoder = [
+            (64, 1, 0),     # [batch, 256, 256, ch] => [batch, 256, 256, 64]
+            (64, 2, 0),     # [batch, 256, 256, 64] => [batch, 128, 128, 64]
+            (128, 2, 0),    # [batch, 128, 128, 64] => [batch, 64, 64, 128]
+            (256, 2, 0),    # [batch, 64, 64, 128] => [batch, 32, 32, 256]
+            (512, 2, 0),    # [batch, 32, 32, 256] => [batch, 16, 16, 512]
+            (512, 2, 0),    # [batch, 16, 16, 512] => [batch, 8, 8, 512]
+            (512, 2, 0),    # [batch, 8, 8, 512] => [batch, 4, 4, 512]
+            (512, 2, 0)     # [batch, 4, 4, 512] => [batch, 2, 2, 512]
+        ]
+
+        kernels_gen_decoder = [
+            (512, 2, 0.5),  # [batch, 2, 2, 512] => [batch, 4, 4, 512]
+            (512, 2, 0.5),  # [batch, 4, 4, 512] => [batch, 8, 8, 512]
+            (512, 2, 0.5),  # [batch, 8, 8, 512] => [batch, 16, 16, 512]
+            (256, 2, 0),    # [batch, 16, 16, 512] => [batch, 32, 32, 256]
+            (128, 2, 0),    # [batch, 32, 32, 256] => [batch, 64, 64, 128]
+            (64, 2, 0),     # [batch, 64, 64, 128] => [batch, 128, 128, 64]
+            (64, 2, 0)      # [batch, 128, 128, 64] => [batch, 256, 256, 64]
+        ]
+
+        return Generator('gen', kernels_gen_encoder, kernels_gen_decoder)
+
+    def create_discriminator(self):
+        kernels_dis = [
+            (64, 2, 0),     # [batch, 256, 256, ch] => [batch, 128, 128, 64]
+            (128, 2, 0),    # [batch, 128, 128, 64] => [batch, 64, 64, 128]
+            (256, 2, 0),    # [batch, 64, 64, 128] => [batch, 32, 32, 256]
+            (512, 2, 0),    # [batch, 32, 32, 256] => [batch, 16, 16, 512]
+            (512, 2, 0),    # [batch, 16, 16, 512] => [batch, 8, 8, 512]
+            (512, 2, 0),    # [batch, 8, 8, 512] => [batch, 4, 4, 512]
+            (512, 1, 0),    # [batch, 4, 4, 512] => [batch, 4, 4, 512]
+        ]
+
+        return Discriminator('dis', kernels_dis)
+
+    def create_dataset(self, training=True):
+        return MomentsInTimeDataset(
             path=self.options.dataset_path,
             training=training,
             augment=self.options.augment)

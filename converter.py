@@ -1,3 +1,5 @@
+# convert Color to BW video clips
+
 import os
 import argparse
 

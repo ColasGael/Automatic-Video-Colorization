@@ -7,7 +7,7 @@ from utils import unpickle
 
 CIFAR10_DATASET = 'cifar10'
 PLACES365_DATASET = 'places365'
-
+MOMENTSINTIME_DATASET = 'Moments_in_Time_Mini'
 
 class BaseDataset():
     def __init__(self, name, path, training=True, augment=True):
@@ -34,6 +34,7 @@ class BaseDataset():
     def __getitem__(self, index):
         val = self.data[index]
         try:
+            # OLD : img = imread(val) if isinstance(val, str) else val
             img = np.load(val) if isinstance(val, str) else val
 
             if self.augment and np.random.binomial(1, 0.5) == 1:
@@ -44,7 +45,7 @@ class BaseDataset():
 
         return img
 
-    def generator(self, batch_size, recusrive=False):
+    def generator(self, batch_size, recursive=False):
         start = 0
         total = len(self)
 
@@ -61,7 +62,7 @@ class BaseDataset():
                 start = end
                 yield np.array(items)
 
-            if recusrive:
+            if recursive:
                 start = 0
 
             else:
@@ -116,15 +117,27 @@ class Places365Dataset(BaseDataset):
 
     def load(self):
         if self.training:
-            #data = np.array(
-            #    glob.glob(self.path + '/data_256/**/*.jpg', recursive=True))
-            #data = np.array(
-                #glob.glob("C:\\Users\\rafae\\Desktop\\Classes\\CS 230 - Stanford\\Colorizing-with-GANs\\dataset\\places365\\data_256\*.jpg"))
-            #data = np.array(glob.glob("C:\\Users\\rafae\\Desktop\\Classes\\CS 230 - Stanford\\frames\\*"))
-            data = np.array(glob.glob("/home/ubuntu/Automatic-Video-Colorization/data/Moments_in_Time_Mini/training/frames2/*"))
+            data = np.array(
+                glob.glob(self.path + '/data_256/**/*.jpg', recursive=True))
+                
         else:
-            #data = np.array(glob.glob(self.path + '/val_256/*.jpg'))
-            #data = np.array(glob.glob("C:\\Users\\rafae\\Desktop\\Classes\\CS 230 - Stanford\\Colorizing-with-GANs\\dataset\\places365\\val_256\*.jpg"))
-            data = np.array(glob.glob("/home/ubuntu/Automatic-Video-Colorization/data/Moments_in_Time_Mini/training/frames/*"))
+            data = np.array(glob.glob(self.path + '/val_256/*.jpg'))
+
+        return data
+
+        
+class MomentsInTimeDataset(BaseDataset):
+    def __init__(self, path, training=True, augment=True):
+        super(MomentsInTimeDataset, self).__init__(MOMENTSINTIME_DATASET, path, training, augment)
+
+    def load(self):
+        if self.training:
+            data = np.array(
+                glob.glob(self.path + '/training/frames2/*', recursive=True))
+
+            #data = np.array(glob.glob("/home/ubuntu/Automatic-Video-Colorization/data/Moments_in_Time_Mini/training/frames2/*"))
+        else:
+            data = np.array(glob.glob(self.path + '/training/frames1/*', recursive=True))
+            #data = np.array(glob.glob("/home/ubuntu/Automatic-Video-Colorization/data/Moments_in_Time_Mini/training/frames/*"))
 
         return data

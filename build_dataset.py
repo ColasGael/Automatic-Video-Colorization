@@ -28,7 +28,7 @@ from tqdm import tqdm
 SIZE = 64
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--data_dir', default='data/SIGNS', help="Directory with the SIGNS dataset")
+parser.add_argument('--data_dir', default='data/SIGNS', help="Directory with the Moments in Time dataset")
 parser.add_argument('--output_dir', default='data/64x64_SIGNS', help="Where to write the new data")
 
 
