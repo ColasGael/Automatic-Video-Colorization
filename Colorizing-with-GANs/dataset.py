@@ -135,7 +135,7 @@ class MomentsInTimeDataset(BaseDataset):
             data = np.array(glob.glob("/home/ubuntu/**/" + self.path + '/train_moments/*', recursive=True))
             #data = np.array(glob.glob("/home/ubuntu/Automatic-Video-Colorization/data/momentsintime/train/*"))
         else:
-            data = np.array(glob.glob("/home/ubuntu/**/" + self.path + '/val_moments/*', recursive=True))
+            data = np.array(glob.glob("/home/ubuntu/**/" + self.path + '/dev_moments/*', recursive=True))
             #data = np.array(glob.glob("/home/ubuntu/Automatic-Video-Colorization/data/momentsintime/val/*"))
 
         return data
