@@ -55,8 +55,6 @@ class BaseModel:
                 self.sess.run([self.dis_train], feed_dict=feed_dic)
                 self.sess.run([self.gen_train, self.accuracy], feed_dict=feed_dic)
                 self.sess.run([self.gen_train, self.accuracy], feed_dict=feed_dic)
-
-                print(self.create_generator().var_list)
                 
                 lossD, lossD_fake, lossD_real, lossG, lossG_l1, lossG_gan, acc, step = self.eval_outputs(feed_dic=feed_dic)
 
@@ -204,10 +202,10 @@ class BaseModel:
         self.dis_loss = tf.reduce_mean(dis_real_ce + dis_fake_ce)
 
         self.gen_loss_gan = tf.reduce_mean(gen_ce)
-        # OLD : self.gen_loss_l1 = tf.reduce_mean(tf.abs(self.input_color - gen)) * self.options.l1_weight
-        self.gen_loss_l1 = tf.reduce_mean(tf.abs(self.input_gray - tf.image.rgb_to_grayscale(gen))) * self.options.l1_weight
+        self.gen_loss_l1 = tf.reduce_mean(tf.abs(self.input_color - gen)) * self.options.l1_weight
+        #self.gen_loss_l1 = tf.reduce_mean(tf.abs(self.input_gray - tf.image.rgb_to_grayscale(gen))) * self.options.l1_weight
 
-        self.gen_loss = self.gen_loss_l1 #self.gen_loss_gan + self.gen_loss_l1
+        self.gen_loss = self.gen_loss_gan + self.gen_loss_l1
 
         self.sampler = gen_factory.create(tf.concat([self.input_gray, self.input_color_t1],3), kernel, seed, reuse_variables=True)
         self.accuracy = pixelwise_accuracy(self.input_color, gen, self.options.color_space, self.options.acc_thresh)
@@ -226,7 +224,8 @@ class BaseModel:
             learning_rate=self.learning_rate,
             beta1=self.options.beta1
         ).minimize(self.gen_loss, var_list=gen_factory.var_list)
-
+    
+        
         # discriminator optimizaer
         self.dis_train = tf.train.AdamOptimizer(
             learning_rate=self.learning_rate,
