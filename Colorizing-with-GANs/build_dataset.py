@@ -38,7 +38,7 @@ parser.add_argument('--data_dir', default='/home/ubuntu/Automatic-Video-Coloriza
 parser.add_argument('--output_dir', default='/home/ubuntu/Automatic-Video-Colorization/data/momentsintime', help="Where to write the new data")
 
 
-def split_resize_and_save(filename, output_dir, size=SIZE):
+def split_resize_and_save(filename, i, output_dir, size=SIZE):
     """Split the video clip in pair of consecutive frames, resize the frames, and save the pairs to the `output_dir`"""
  
     # counter to build pairs of consecutive frames
@@ -114,7 +114,7 @@ if __name__ == '__main__':
             print("Warning: dir {} already exists".format(output_dir_split))
 
         print("Processing {} data, saving preprocessed data to {}".format(split, output_dir_split))
-        for filename in tqdm(filenames[split]):
-            split_resize_and_save(filename, output_dir_split, size=SIZE)
+        for i, filename in enumerate(tqdm(filenames[split])):
+            split_resize_and_save(filename, i, output_dir_split, size=SIZE)
 
     print("Done building dataset")
