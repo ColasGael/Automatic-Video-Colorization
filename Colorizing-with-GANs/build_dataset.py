@@ -93,7 +93,7 @@ if __name__ == '__main__':
     filenames.sort()
     random.shuffle(filenames)
 
-    split = int(0.8 * len(filenames))
+    split = int(0.9 * len(filenames))
     train_filenames = filenames[:split]
     dev_filenames = filenames[split:]
 

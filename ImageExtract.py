@@ -8,9 +8,7 @@ def main():
     
     count = 0
     for i in range(len(videos)):
-        
-        #'ScotlandTransport.mp4'
-        
+                
         vidcap = cv2.VideoCapture(videos[i])
         success,image = vidcap.read()
         resized_image_new = cv2.resize(image, (256, 256)) 
