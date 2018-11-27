@@ -29,7 +29,7 @@ import cv2
 SIZE = 256
 
 # subfolder of the "Moments_in_Time" dataset to consider
-SUBFOLDER = "baking"
+SUBFOLDER = "/baking"
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--data_dir', default='/home/ubuntu/Automatic-Video-Colorization/data/Moments_in_Time_Mini', help="Directory with the Moments in Time dataset")
@@ -74,15 +74,15 @@ if __name__ == '__main__':
     assert os.path.isdir(args.data_dir), "Couldn't find the dataset at {}".format(args.data_dir)
 
     # Define the data directories
-    train_data_dir = os.path.join(args.data_dir, 'training')
-    test_data_dir = os.path.join(args.data_dir, 'validation')
+    train_data_dir = os.path.join(args.data_dir, 'training' + SUBFOLDER)
+    test_data_dir = os.path.join(args.data_dir, 'validation' + SUBFOLDER)
 
     # Get the filenames in each directory (train and test)
     filenames = os.listdir(train_data_dir)
-    filenames = [os.path.join(train_data_dir, f) for f in filenames if f.endswith('.jpg')]
+    filenames = [os.path.join(train_data_dir, f) for f in filenames if f.endswith('.mp4')]
 
     test_filenames = os.listdir(test_data_dir)
-    test_filenames = [os.path.join(test_data_dir, f) for f in test_filenames if f.endswith('.jpg')]
+    test_filenames = [os.path.join(test_data_dir, f) for f in test_filenames if f.endswith('.mp4')]
 
     # Split the images in 'train_moments' into 80% train and 20% dev
     # Make sure to always shuffle with a fixed seed so that the split is reproducible
@@ -105,7 +105,7 @@ if __name__ == '__main__':
 
     # Preprocess train, dev and test
     for split in ['train', 'dev', 'test']:
-        output_dir_split = os.path.join(args.output_dir, SUBFOLDER + '/{}_moments'.format(split))
+        output_dir_split = os.path.join(args.output_dir, '{}_moments'.format(split))
         if not os.path.exists(output_dir_split):
             os.mkdir(output_dir_split)
         else:
