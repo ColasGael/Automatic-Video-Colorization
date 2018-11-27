@@ -29,11 +29,11 @@ import cv2
 SIZE = 256
 
 # subfolder of the "Moments_in_Time" dataset to consider
-SUBFOLDER = "baking"
+SUBFOLDER = "/baking"
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--data_dir', default='~/Automatic-Video-Colorization/data/Moments_in_Time_Mini', help="Directory with the Moments in Time dataset")
-parser.add_argument('--output_dir', default='~/Automatic-Video-Colorization/data/momentsintime', help="Where to write the new data")
+parser.add_argument('--data_dir', default='/home/ubuntu/Automatic-Video-Colorization/data/Moments_in_Time_Mini', help="Directory with the Moments in Time dataset")
+parser.add_argument('--output_dir', default='/home/ubuntu/Automatic-Video-Colorization/data/momentsintime', help="Where to write the new data")
 
 
 def split_resize_and_save(filename, output_dir, size=SIZE):
