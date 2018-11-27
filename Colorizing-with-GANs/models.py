@@ -187,11 +187,11 @@ class BaseModel:
 
         self.input_gray = tf.image.rgb_to_grayscale(self.input_rgb)
         self.input_color = preprocess(self.input_rgb, colorspace_in=COLORSPACE_RGB, colorspace_out=self.options.color_space)
-        self.input_color_t1 = preprocess(self.input_rgb_prev, colorspace_in=COLORSPACE_RGB, colorspace_out=self.options.color_space)
+        self.input_color_prev = preprocess(self.input_rgb_prev, colorspace_in=COLORSPACE_RGB, colorspace_out=self.options.color_space)
 
-        gen = gen_factory.create(tf.concat([self.input_gray, self.input_color_t1],3), kernel, seed)
-        dis_real = dis_factory.create(tf.concat([self.input_color, self.input_color_t1], 3), kernel, seed)
-        dis_fake = dis_factory.create(tf.concat([gen, self.input_color_t1], 3), kernel, seed, reuse_variables=True)
+        gen = gen_factory.create(tf.concat([self.input_gray, self.input_color_prev],3), kernel, seed)
+        dis_real = dis_factory.create(tf.concat([self.input_color, self.input_color_prev], 3), kernel, seed)
+        dis_fake = dis_factory.create(tf.concat([gen, self.input_color_prev], 3), kernel, seed, reuse_variables=True)
 
         gen_ce = tf.nn.sigmoid_cross_entropy_with_logits(logits=dis_fake, labels=tf.ones_like(dis_fake))
         dis_real_ce = tf.nn.sigmoid_cross_entropy_with_logits(logits=dis_real, labels=tf.ones_like(dis_real) * smoothing)
@@ -207,7 +207,7 @@ class BaseModel:
 
         self.gen_loss = self.gen_loss_gan + self.gen_loss_l1
 
-        self.sampler = gen_factory.create(tf.concat([self.input_gray, self.input_color_t1],3), kernel, seed, reuse_variables=True)
+        self.sampler = gen_factory.create(tf.concat([self.input_gray, self.input_color_prev],3), kernel, seed, reuse_variables=True)
         self.accuracy = pixelwise_accuracy(self.input_color, gen, self.options.color_space, self.options.acc_thresh)
         self.learning_rate = tf.constant(self.options.lr)
 
