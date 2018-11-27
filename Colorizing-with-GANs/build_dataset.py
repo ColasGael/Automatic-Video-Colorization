@@ -29,7 +29,7 @@ import cv2
 SIZE = 256
 
 # subfolder of the "Moments_in_Time" dataset to consider
-SUBFOLDER = "/baking"
+SUBFOLDER = "baking"
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--data_dir', default='/home/ubuntu/Automatic-Video-Colorization/data/Moments_in_Time_Mini', help="Directory with the Moments in Time dataset")
@@ -105,7 +105,7 @@ if __name__ == '__main__':
 
     # Preprocess train, dev and test
     for split in ['train', 'dev', 'test']:
-        output_dir_split = os.path.join(args.output_dir, SUBFOLDER + '{}_moments'.format(split))
+        output_dir_split = os.path.join(args.output_dir, SUBFOLDER + '/{}_moments'.format(split))
         if not os.path.exists(output_dir_split):
             os.mkdir(output_dir_split)
         else:
