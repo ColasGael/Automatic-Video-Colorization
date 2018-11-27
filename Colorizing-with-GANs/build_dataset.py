@@ -71,9 +71,6 @@ def split_resize_and_save(filename, output_dir, size=SIZE):
 if __name__ == '__main__':
     args = parser.parse_args()
     
-    if not SUBFOLDER == None:
-        args.data_dir = args.data_dir + SUBFOLDER
-    
     assert os.path.isdir(args.data_dir), "Couldn't find the dataset at {}".format(args.data_dir)
 
     # Define the data directories
@@ -108,7 +105,7 @@ if __name__ == '__main__':
 
     # Preprocess train, dev and test
     for split in ['train', 'dev', 'test']:
-        output_dir_split = os.path.join(args.output_dir, '{}_moments'.format(split))
+        output_dir_split = os.path.join(args.output_dir, SUBFOLDER + '{}_moments'.format(split))
         if not os.path.exists(output_dir_split):
             os.mkdir(output_dir_split)
         else:
