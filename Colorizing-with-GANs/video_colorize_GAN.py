@@ -15,7 +15,7 @@ from models import MomentsInTimeModel
 def image_colorization_propagation(img_bw_in, img_rgb_prev, options):
     # reset tensorflow graph
     tf.reset_default_graph()
-
+    print(img_bw_in.shape, img_rgb_prev.shape)
     # create a session environment
     with tf.Session() as sess:
         model = MomentsInTimeModel(sess, options)
