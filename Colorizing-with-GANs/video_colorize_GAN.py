@@ -69,7 +69,7 @@ def bw2color(options, inputname, inputpath, outputpath):
                 # convert BGR to RGB convention
                 frame_in = frame_in[:,:,::-1]
                 # colorize the BW frame
-                frame_out = image_colorization(frame_in, frame_prev, options)
+                frame_out = image_colorization_propagation(frame_in, frame_prev, options)
                 # convert RGB to BGR convention
                 frame_out = frame_out[:,:,::-1]
                 # save the recolororized frame
