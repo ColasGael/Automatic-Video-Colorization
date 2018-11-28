@@ -28,7 +28,7 @@ def image_colorization_propagation(img_bw_in, img_rgb_prev, options):
         model.load()
 
         # colorize the image based on the previous one
-        feed_dic = {model.input_rgb: img_bw_in, model.input_rgb_prev: img_rgb_prev}
+        feed_dic = {model.input_rgb: img_bw_in.unsqueeze(0), model.input_rgb_prev: img_rgb_prev.unsqueeze(0)}
         fake_image = sess.run(model.sampler, feed_dict=feed_dic)
         img_rgb_out = postprocess(tf.convert_to_tensor(fake_image), colorspace_in=options.color_space, colorspace_out=COLORSPACE_RGB)
 
