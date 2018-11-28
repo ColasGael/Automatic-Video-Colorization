@@ -34,7 +34,7 @@ def image_colorization_propagation(img_bw_in, img_rgb_prev, options):
 
     return img_rgb_out
 
-def bw2color(args, inputname, inputpath, outputpath):
+def bw2color(options, inputname, inputpath, outputpath):
     if inputname.endswith(".mp4"):
         
         # store informations about the original video
@@ -92,9 +92,9 @@ def main():
 
     if options.filename == '*':
         for filename in os.listdir(options.input_dir):
-            bw2color(args, inputname = options.filename, inputpath = options.input_dir, outputpath = options.output_dir)
+            bw2color(options, inputname = options.filename, inputpath = options.input_dir, outputpath = options.output_dir)
     else:
-        bw2color(args, inputname = options.filename, inputpath = options.input_dir, outputpath = options.output_dir)
+        bw2color(options, inputname = options.filename, inputpath = options.input_dir, outputpath = options.output_dir)
         
     # cleanup
     cv2.destroyAllWindows()
