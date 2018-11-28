@@ -60,7 +60,7 @@ def bw2color(options, inputname, inputpath, outputpath):
         )
         
         # TO CHANGE pick the first frame from the original video clip 
-        cap_temp = cv2.VideoCapture("/home/ubuntu/Automatic-Video-Colorization/data/examples/raw/" + inputname[3:])
+        cap_temp = cv2.VideoCapture("/home/ubuntu/Automatic-Video-Colorization/data/examples/color/color" + inputname[2:])
         ret, frame_prev = cap_temp.read()
         
         while(cap.isOpened()):
