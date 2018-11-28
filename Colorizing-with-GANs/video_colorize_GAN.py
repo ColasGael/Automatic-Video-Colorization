@@ -46,7 +46,7 @@ def bw2color(options, inputname, inputpath, outputpath):
         fourcc = cv2.VideoWriter_fourcc(*'mp4v');
         # parameters of output file
             # dimensions of the output image
-        new_width, new_height = width, height
+        new_width, new_height = 64, 64
             # number of frames
         fps = 30.0
     
@@ -62,6 +62,9 @@ def bw2color(options, inputname, inputpath, outputpath):
         # TO CHANGE pick the first frame from the original video clip 
         cap_temp = cv2.VideoCapture("/home/ubuntu/Automatic-Video-Colorization/data/examples/converted/color" + inputname[2:])
         ret, frame_prev = cap_temp.read()
+        size = 64
+        frame_prev = cv2.resize(frame_prev, (size, size)) 
+
         
         while(cap.isOpened()):
             ret, frame_in = cap.read()
@@ -69,6 +72,8 @@ def bw2color(options, inputname, inputpath, outputpath):
             if ret==True:                
                 # convert BGR to RGB convention
                 frame_in = frame_in[:,:,::-1]
+                # resize the frame to match the input size of the GAN
+                frame_in = cv2.resize(frame_in, (size, size)) 
                 # colorize the BW frame
                 frame_out = image_colorization_propagation(frame_in, frame_prev, options)
                 # save the recolororized frame
