@@ -32,7 +32,7 @@ def image_colorization_propagation(img_bw_in, img_rgb_prev, options):
         fake_image = self.sess.run(self.sampler, feed_dict=feed_dic)
         img_rgb_out = postprocess(tf.convert_to_tensor(fake_image), colorspace_in=self.options.color_space, colorspace_out=COLORSPACE_RGB)
 
-	return img_rgb_out
+    return img_rgb_out
 
 def bw2color(args, inputname, inputpath, outputpath):
     if inputname.endswith(".mp4"):
