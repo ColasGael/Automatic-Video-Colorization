@@ -22,6 +22,8 @@ def main(options):
     # create a session environment
     with tf.Session() as sess:
 
+        model = MomentsInTimeModel(sess, options)
+        
         if options.dataset == CIFAR10_DATASET:
             model = Cifar10Model(sess, options)
 
