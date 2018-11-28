@@ -7,32 +7,26 @@ import numpy as np
 from skimage import img_as_float
 import skimage.color as color
 import scipy.ndimage.interpolation as sni
+from ops import postprocess
+from ops import COLORSPACE_RGB, COLORSPACE_LAB
 
 import tensorflow as tf
 from options import ModelOptions
 from models import MomentsInTimeModel
+
     
-def image_colorization_propagation(img_bw_in, img_rgb_prev, options):
-    # reset tensorflow graph
-    tf.reset_default_graph()
-    print(img_bw_in.shape, img_rgb_prev.shape)
-    # create a session environment
-    with tf.Session() as sess:
-        model = MomentsInTimeModel(sess, options)
+def image_colorization_propagation(model, img_bw_in, img_rgb_prev, options):
 
-        # build the model and initialize
-        model.build()
-        sess.run(tf.global_variables_initializer())
-
-        # load model only after global variables initialization
-        model.load()
-
-        # colorize the image based on the previous one
-        feed_dic = {model.input_rgb: np.expand_dims(img_bw_in, axis=0), model.input_rgb_prev: np.expand_dims(img_rgb_prev, axis=0)}
-        fake_image, _ = sess.run([model.sampler, model.input_gray], feed_dict=feed_dic)
-        img_rgb_out = postprocess(tf.convert_to_tensor(fake_image), colorspace_in=options.color_space, colorspace_out=COLORSPACE_RGB)
-        img_rgb_out = img_rgb_out.squeeze(0)
-
+    # colorize the image based on the previous one
+    feed_dic = {model.input_rgb: np.expand_dims(img_bw_in, axis=0), model.input_rgb_prev: np.expand_dims(img_rgb_prev, axis=0)}
+    fake_image, _ = model.sess.run([model.sampler, model.input_gray], feed_dict=feed_dic)
+    img_rgb_out = postprocess(tf.convert_to_tensor(fake_image), colorspace_in=options.color_space, colorspace_out=COLORSPACE_RGB)
+    img_rgb_out = tf.squeeze(img_rgb_out)
+    img_rgb_out = img_rgb_out.eval()
+    #print("as float32",img_rgb_out)
+    img_rgb_out *= 255.0
+    img_rgb_out = img_rgb_out.astype(np.uint8)
+    #print("as uint8",img_rgb_out)
     return img_rgb_out
 
 def bw2color(options, inputname, inputpath, outputpath):
@@ -41,12 +35,12 @@ def bw2color(options, inputname, inputpath, outputpath):
         # store informations about the original video
         cap = cv2.VideoCapture(inputpath + inputname)
         # original dimensions
-        width, height = int(cap.get(3)), int(cap.get(4))
-
+        width, height = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        totalFrames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         fourcc = cv2.VideoWriter_fourcc(*'mp4v');
         # parameters of output file
             # dimensions of the output image
-        new_width, new_height = 64, 64
+        new_width, new_height = 256, 256
             # number of frames
         fps = 30.0
     
@@ -62,38 +56,58 @@ def bw2color(options, inputname, inputpath, outputpath):
         # TO CHANGE pick the first frame from the original video clip 
         cap_temp = cv2.VideoCapture("/home/ubuntu/Automatic-Video-Colorization/data/examples/converted/color" + inputname[2:])
         ret, frame_prev = cap_temp.read()
-        size = 64
+        size = 256
+        # convert BGR to RGB convention
+        frame_prev = frame_prev[:,:,::-1]
         frame_prev = cv2.resize(frame_prev, (size, size)) 
+        frames_processed = 0
 
-        
-        while(cap.isOpened()):
-            ret, frame_in = cap.read()
-            # check if we are not at the end of the video
-            if ret==True:                
-                # convert BGR to RGB convention
-                frame_in = frame_in[:,:,::-1]
-                # resize the frame to match the input size of the GAN
-                frame_in = cv2.resize(frame_in, (size, size)) 
-                # colorize the BW frame
-                frame_out = image_colorization_propagation(frame_in, frame_prev, options)
-                # save the recolororized frame
-                frame_prev = frame_out
-                # convert RGB to BGR convention
-                frame_out = frame_out[:,:,::-1]
-                # write the color frame
-                color_out.write(frame_out)
+        with tf.Session() as sess:
+
+            model = MomentsInTimeModel(sess, options)
+
+            # build the model and initialize
+            model.build()
+            sess.run(tf.global_variables_initializer())
+
+            # load model only after global variables initialization
+            model.load()
+
+            while(cap.isOpened()):
+                ret, frame_in = cap.read()
+                # check if we are not at the end of the video
+                if ret==True:                
+                    # convert BGR to RGB convention
+                    frame_in = frame_in[:,:,::-1]
+                    # resize the frame to match the input size of the GAN
+                    frame_in = cv2.resize(frame_in, (size, size)) 
+                    # colorize the BW frame
+                    frame_out = image_colorization_propagation(model, frame_in, frame_prev, options)
+                    # save the recolororized frame
+                    frame_prev = frame_out
+                    # convert RGB to BGR convention
+                    frame_out = frame_out[:,:,::-1]
+                    # write the color frame
+                    color_out.write(frame_out)
                 
-                if cv2.waitKey(1) & 0xFF == ord('q'):
+                    # print progress
+                    frames_processed += 1
+                    print("Processed {}/{} frames ({}%)".format(frames_processed, totalFrames, frames_processed * 100 //totalFrames), end="\r")
+                    if cv2.waitKey(1) & 0xFF == ord('q'):
+                        break
+                # end of the video
+                else:
                     break
-            # end of the video
-            else:
-                break
 
         # release everything if job is finished
         cap.release()
         color_out.release()
 
 def main():
+
+    # reset tensorflow graph
+    tf.reset_default_graph()
+
     options = ModelOptions().parse()
 
     if options.filename == '*':
