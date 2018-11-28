@@ -19,7 +19,7 @@ class ModelOptions:
         parser.add_argument('--seed', type=int, default=0, metavar='S', help='random seed (default: 0)')
         parser.add_argument('--name', type=str, default='CGAN', help='arbitrary model name (default: CGAN)')
         parser.add_argument('--mode', default=0, help='run mode [0: train, 1: evaluate, 2: test] (default: 0)')
-        parser.add_argument('--dataset', type=str, default='Moments_in_Time_Mini', help='the name of dataset [places365, cifar10] (default: Moments_in_Time_Mini)')
+        parser.add_argument('--dataset', type=str, default='momentsintime', help='the name of dataset [places365, cifar10] (default: momentsintime)')
         parser.add_argument('--dataset-path', type=str, default='./data', help='dataset path (default: ./data)')
         parser.add_argument('--checkpoints-path', type=str, default='./checkpoints', help='models are saved here (default: ./checkpoints)')
         parser.add_argument('--batch-size', type=int, default=16, metavar='N', help='input batch size for training (default: 16)')
@@ -48,7 +48,11 @@ class ModelOptions:
         parser.add_argument('--test-size', type=int, default=100, metavar='N', help='number of Turing tests (default: 100)')
         parser.add_argument('--test-delay', type=int, default=0, metavar='N', help='number of seconds to wait when doing Turing test, 0 for unlimited (default: 0)')
         parser.add_argument('--gpu-ids', type=str, default='0', help='gpu ids: e.g. 0  0,1,2, 0,2. use -1 for CPU')
-
+        # to recolorize a video clip
+        parser.add_argument('--filename', type=str, default='*', help='Filename of input BW video')
+        parser.add_argument('--input_dir', type=str, default='/home/ubuntu/Automatic-Video-Colorization/data/examples/converted/', help='Directory of input files')
+        parser.add_argument('--output_dir', type=str, default='/home/ubuntu/Automatic-Video-Colorization/data/examples/recolorized/', help='Directory of output files')
+        
         self._parser = parser
 
     def parse(self):

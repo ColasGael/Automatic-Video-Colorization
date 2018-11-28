@@ -21,8 +21,6 @@ def main(options):
 
     # create a session environment
     with tf.Session() as sess:
-
-        model = MomentsInTimeModel(sess, options)
         
         if options.dataset == CIFAR10_DATASET:
             model = Cifar10Model(sess, options)
@@ -64,7 +62,7 @@ def main(options):
             model.evaluate()
             while True:
                 model.sample()
-
+        
         else:
             model.turing_test()
 
