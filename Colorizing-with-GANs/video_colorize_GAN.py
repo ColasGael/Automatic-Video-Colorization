@@ -33,7 +33,7 @@ def image_colorization_propagation(model, img_bw_in, img_rgb_prev, options):
     #img_rgb_out = img_rgb_out.astype(np.uint8)
     #print("as uint8",img_rgb_out)
     #return img_rgb_out
-    return img_as_ubyte(img_rgb_out)
+    return img_rgb_out
 
 def bw2color(options, inputname, inputpath, outputpath):
     if inputname.endswith(".mp4"):
