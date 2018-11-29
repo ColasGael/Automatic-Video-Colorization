@@ -4,6 +4,7 @@ import argparse
 
 import cv2
 import numpy as np
+from PIL import Image
 from skimage import img_as_ubyte, img_as_float
 import skimage.color as color
 import scipy.ndimage.interpolation as sni
@@ -32,7 +33,8 @@ def image_colorization_propagation(model, img_bw_in, img_rgb_prev, options):
     #img_rgb_out *= 255.0
     #img_rgb_out = img_rgb_out.astype(np.uint8)
     #print("as uint8",img_rgb_out)
-    #return img_rgb_out
+    #return img_as_ubyte(img_rgb_out)
+
     return img_rgb_out
 
 def bw2color(options, inputname, inputpath, outputpath):
@@ -60,8 +62,8 @@ def bw2color(options, inputname, inputpath, outputpath):
         )
         
         # TO CHANGE pick the first frame from the original video clip 
-        #cap_temp = cv2.VideoCapture("/home/ubuntu/Automatic-Video-Colorization/data/Moments_processed/color" + inputname[2:])
-        cap_temp = cv2.VideoCapture("/home/ubuntu/Automatic-Video-Colorization/data/examples/converted/color" + inputname[2:])
+        cap_temp = cv2.VideoCapture("/home/ubuntu/Automatic-Video-Colorization/data/Moments_processed/color" + inputname[2:])
+        #cap_temp = cv2.VideoCapture("/home/ubuntu/Automatic-Video-Colorization/data/examples/converted/color" + inputname[2:])
         ret, frame_prev = cap_temp.read()
         size = 256
         # convert BGR to RGB convention
@@ -87,16 +89,29 @@ def bw2color(options, inputname, inputpath, outputpath):
                     # convert BGR to RGB convention
                     frame_in = frame_in[:,:,::-1]
                     # resize the frame to match the input size of the GAN
-                    frame_in = cv2.resize(frame_in, (size, size)) 
+                    frame_in = cv2.resize(frame_in, (size, size))
+
                     # colorize the BW frame
                     frame_out = image_colorization_propagation(model, frame_in, frame_prev, options)
-                    # save the recolororized frame
-                    frame_prev = frame_out
+                    
+                    #generate sample
+                    if(True):                    
+                        img = Image.fromarray(frame_out)
+
+                        if not os.path.exists(model.samples_dir):
+                            os.makedirs(model.samples_dir)
+
+                        sample = model.options.dataset + "_" + inputname + "_" + str(frames_processed).zfill(5) + ".png"
+                        img.save(os.path.join(model.samples_dir, sample))
+
+                    # save the recolorized frame
+                    #frame_prev = frame_out
                     # convert RGB to BGR convention
                     frame_out = frame_out[:,:,::-1]
                     # write the color frame
                     color_out.write(frame_out)
                     #break                
+                    
                     # print progress
                     frames_processed += 1
                     print("Processed {}/{} frames ({}%)".format(frames_processed, totalFrames, frames_processed * 100 //totalFrames), end="\r")
