@@ -31,7 +31,9 @@ def image_colorization_propagation(model, img_bw_in, img_rgb_prev, options):
 
 def bw2color(options, inputname, inputpath, outputpath):
     if inputname.endswith(".mp4"):
-        
+        # size of the input frames
+        size = 256
+
         # check that the video exists
         path_to_video = os.path.join(inputpath, inputname)
         if not os.path.exists(path_to_video):
@@ -45,7 +47,7 @@ def bw2color(options, inputname, inputpath, outputpath):
         fourcc = cv2.VideoWriter_fourcc(*'mp4v');
         # parameters of output file
             # dimensions of the output image
-        new_width, new_height = 256, 256
+        new_width, new_height = size, size
             # number of frames
         fps = 30.0
     
@@ -60,11 +62,11 @@ def bw2color(options, inputname, inputpath, outputpath):
         
         # TO CHANGE pick the first frame from the original video clip 
         cap_temp = cv2.VideoCapture(os.path.join(inputpath, "color" + inputname[2:]))
-        ret, frame_prev = cap_temp.read()
-        size = 256
+        #ret_temp, frame_prev = cap_temp.read()
         # convert BGR to RGB convention
-        frame_prev = frame_prev[:,:,::-1]
-        frame_prev = cv2.resize(frame_prev, (size, size)) 
+        #frame_prev = frame_prev[:,:,::-1]
+        #frame_prev = cv2.resize(frame_prev, (size, size)) 
+        # count the number of recolorized frames
         frames_processed = 0
 
         with tf.Session() as sess:
@@ -80,8 +82,14 @@ def bw2color(options, inputname, inputpath, outputpath):
 
             while(cap.isOpened()):
                 ret, frame_in = cap.read()
+                
+                ret_temp, frame_prev = cap_temp.read()
+                
                 # check if we are not at the end of the video
-                if ret==True:                
+                if ret==True:      
+                    frame_prev = frame_prev[:,:,::-1]
+                    frame_prev = cv2.resize(frame_prev, (size, size))
+                    
                     # convert BGR to RGB convention
                     frame_in = frame_in[:,:,::-1]
                     # resize the frame to match the input size of the GAN
