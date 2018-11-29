@@ -46,11 +46,11 @@ def split_resize_and_save(filename, i, output_dir, size=SIZE):
                 
     vidcap = cv2.VideoCapture(filename)
     
-    success, image = vidcap.read()
+    success, frame = vidcap.read()
     # default : use bilinear interpolation
     # convert BGR to RGB convention
     frame = frame[:,:,::-1]
-    frame = cv2.resize(image, (size, size)) 
+    frame = cv2.resize(frame, (size, size)) 
     
     while success:
     
