@@ -59,7 +59,7 @@ def bw2color(options, inputname, inputpath, outputpath):
         )
         
         # TO CHANGE pick the first frame from the original video clip 
-        cap_temp = cv2.VideoCapture(os.path.join(inputpath, inputname[2:]))
+        cap_temp = cv2.VideoCapture(os.path.join(inputpath, "color" + inputname[2:]))
         ret, frame_prev = cap_temp.read()
         size = 256
         # convert BGR to RGB convention
