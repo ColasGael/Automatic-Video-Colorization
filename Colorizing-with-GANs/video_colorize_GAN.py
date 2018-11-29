@@ -33,6 +33,7 @@ def bw2color(options, inputname, inputpath, outputpath):
     if inputname.endswith(".mp4"):
         
         # store informations about the original video
+        print(os.path.join(inputpath, inputname))
         cap = cv2.VideoCapture(os.path.join(inputpath, inputname))
         # original dimensions
         width, height = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
