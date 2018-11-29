@@ -50,8 +50,8 @@ class ModelOptions:
         parser.add_argument('--gpu-ids', type=str, default='0', help='gpu ids: e.g. 0  0,1,2, 0,2. use -1 for CPU')
         # to recolorize a video clip
         parser.add_argument('--filename', type=str, default='*', help='Filename of input BW video')
-        parser.add_argument('--input_dir', type=str, default='/home/ubuntu/Automatic-Video-Colorization/data/examples/converted/', help='Directory of input files')
-        parser.add_argument('--output_dir', type=str, default='/home/ubuntu/Automatic-Video-Colorization/data/examples/recolorized/', help='Directory of output files')
+        parser.add_argument('--input_dir', type=str, default='../data/examples/converted', help='Directory of input files')
+        parser.add_argument('--output_dir', type=str, default='../data/examples/recolorized', help='Directory of output files')
         
         self._parser = parser
 
