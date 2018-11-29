@@ -4,7 +4,7 @@ import argparse
 
 import cv2
 import numpy as np
-from skimage import img_as_float
+from skimage import img_as_ubyte, img_as_float
 import skimage.color as color
 import scipy.ndimage.interpolation as sni
 from ops import postprocess
@@ -24,10 +24,11 @@ def image_colorization_propagation(model, img_bw_in, img_rgb_prev, options):
     img_rgb_out = tf.squeeze(img_rgb_out)
     img_rgb_out = img_rgb_out.eval()
     #print("as float32",img_rgb_out)
-    img_rgb_out *= 255.0
-    img_rgb_out = img_rgb_out.astype(np.uint8)
+    #img_rgb_out *= 255.0
+    #img_rgb_out = img_rgb_out.astype(np.uint8)
     #print("as uint8",img_rgb_out)
-    return img_rgb_out
+    #return img_rgb_out
+    return img_as_ubyte(img_rgb_out)
 
 def bw2color(options, inputname, inputpath, outputpath):
     if inputname.endswith(".mp4"):
@@ -54,7 +55,8 @@ def bw2color(options, inputname, inputpath, outputpath):
         )
         
         # TO CHANGE pick the first frame from the original video clip 
-        cap_temp = cv2.VideoCapture("/home/ubuntu/Automatic-Video-Colorization/data/examples/converted/color" + inputname[2:])
+        cap_temp = cv2.VideoCapture("/home/ubuntu/Automatic-Video-Colorization/data/Moments_processed/color" + inputname[2:])
+        #cap_temp = cv2.VideoCapture("/home/ubuntu/Automatic-Video-Colorization/data/examples/converted/color" + inputname[2:])
         ret, frame_prev = cap_temp.read()
         size = 256
         # convert BGR to RGB convention
@@ -89,7 +91,7 @@ def bw2color(options, inputname, inputpath, outputpath):
                     frame_out = frame_out[:,:,::-1]
                     # write the color frame
                     color_out.write(frame_out)
-                
+                    #break                
                     # print progress
                     frames_processed += 1
                     print("Processed {}/{} frames ({}%)".format(frames_processed, totalFrames, frames_processed * 100 //totalFrames), end="\r")
