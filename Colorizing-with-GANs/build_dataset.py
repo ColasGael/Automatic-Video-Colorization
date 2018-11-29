@@ -34,8 +34,8 @@ SIZE = 256
 SUBFOLDER = "/baking"
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--data_dir', default='/home/ubuntu/Automatic-Video-Colorization/data/Moments_in_Time_Mini', help="Directory with the Moments in Time dataset")
-parser.add_argument('--output_dir', default='/home/ubuntu/Automatic-Video-Colorization/data/momentsintime', help="Where to write the new data")
+parser.add_argument('--data_dir', default='../data/Moments_in_Time_Mini', help="Directory with the Moments in Time dataset")
+parser.add_argument('--output_dir', default='../data/momentsintime', help="Where to write the new data")
 
 
 def split_resize_and_save(filename, i, output_dir, size=SIZE):
