@@ -23,17 +23,9 @@ def image_colorization_propagation(model, img_bw_in, img_rgb_prev, options):
     fake_image, _ = model.sess.run([model.sampler, model.input_gray], feed_dict=feed_dic)
     fake_image = postprocess(tf.convert_to_tensor(fake_image), colorspace_in=options.color_space, colorspace_out=COLORSPACE_RGB)
     
-    #fake_image = tf.squeeze(fake_image)
-    #img_rgb_out = fake_image.eval()
     # evalute the tensor
     img_rgb_out = fake_image.eval()
     img_rgb_out = (img_rgb_out.squeeze(0) * 255).astype(np.uint8)
-    
-    #print("as float32",img_rgb_out)
-    #img_rgb_out *= 255.0
-    #img_rgb_out = img_rgb_out.astype(np.uint8)
-    #print("as uint8",img_rgb_out)
-    #return img_as_ubyte(img_rgb_out)
 
     return img_rgb_out
 
@@ -95,7 +87,8 @@ def bw2color(options, inputname, inputpath, outputpath):
                     frame_out = image_colorization_propagation(model, frame_in, frame_prev, options)
                     
                     #generate sample
-                    if(True):                    
+                    get_image = False
+                    if get_image:                    
                         img = Image.fromarray(frame_out)
 
                         if not os.path.exists(model.samples_dir):
@@ -105,7 +98,7 @@ def bw2color(options, inputname, inputpath, outputpath):
                         img.save(os.path.join(model.samples_dir, sample))
 
                     # save the recolorized frame
-                    #frame_prev = frame_out
+                    frame_prev = frame_out
                     # convert RGB to BGR convention
                     frame_out = frame_out[:,:,::-1]
                     # write the color frame
