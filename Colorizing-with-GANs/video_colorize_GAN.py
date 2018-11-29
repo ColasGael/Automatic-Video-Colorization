@@ -32,9 +32,13 @@ def image_colorization_propagation(model, img_bw_in, img_rgb_prev, options):
 def bw2color(options, inputname, inputpath, outputpath):
     if inputname.endswith(".mp4"):
         
+        # check that the video exists
+        path_to_video = os.path.join(inputpath, inputname)
+        if not os.path.exists(path_to_video):
+            print("The file :", path_to_video, "does not exist !")
+        
         # store informations about the original video
-        print(os.path.join(inputpath, inputname))
-        cap = cv2.VideoCapture(os.path.join(inputpath, inputname))
+        cap = cv2.VideoCapture(os.path.join(path_to_video))
         # original dimensions
         width, height = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         totalFrames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
