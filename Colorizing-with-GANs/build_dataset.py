@@ -48,23 +48,23 @@ def split_resize_and_save(filename, i, output_dir, size=SIZE):
     
     success, image = vidcap.read()
     # default : use bilinear interpolation
+    # convert BGR to RGB convention
+    frame = frame[:,:,::-1]
     frame = cv2.resize(image, (size, size)) 
     
     while success:
     
       frame_prev = frame     
       success, frame = vidcap.read()
-      # convert BGR to RGB convention
       
       if success:
+          # convert BGR to RGB convention
           frame = frame[:,:,::-1]
           frame = cv2.resize(frame, (size, size)) 
           img = np.concatenate((frame, frame_prev), 2)
           
       #print('Read a new frame: ', success)
-      
-      #cv2.imwrite("frame%d.jpg" % count, img)     # save frame as JPEG file 
-      
+            
       if count % 2 ==0:
           np.save(output_dir + "/video{}_frame{}".format(i, count), img)
           
