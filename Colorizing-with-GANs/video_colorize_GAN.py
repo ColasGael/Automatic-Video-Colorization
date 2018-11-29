@@ -20,9 +20,14 @@ def image_colorization_propagation(model, img_bw_in, img_rgb_prev, options):
     # colorize the image based on the previous one
     feed_dic = {model.input_rgb: np.expand_dims(img_bw_in, axis=0), model.input_rgb_prev: np.expand_dims(img_rgb_prev, axis=0)}
     fake_image, _ = model.sess.run([model.sampler, model.input_gray], feed_dict=feed_dic)
-    img_rgb_out = postprocess(tf.convert_to_tensor(fake_image), colorspace_in=options.color_space, colorspace_out=COLORSPACE_RGB)
-    img_rgb_out = tf.squeeze(img_rgb_out)
-    img_rgb_out = img_rgb_out.eval()
+    fake_image = postprocess(tf.convert_to_tensor(fake_image), colorspace_in=options.color_space, colorspace_out=COLORSPACE_RGB)
+    
+    #fake_image = tf.squeeze(fake_image)
+    #img_rgb_out = fake_image.eval()
+    # evalute the tensor
+    img_rgb_out = fake_image.eval()
+    img_rgb_out = (img_rgb_out.squeeze(0) * 255).astype(np.uint8)
+    
     #print("as float32",img_rgb_out)
     #img_rgb_out *= 255.0
     #img_rgb_out = img_rgb_out.astype(np.uint8)
@@ -55,8 +60,8 @@ def bw2color(options, inputname, inputpath, outputpath):
         )
         
         # TO CHANGE pick the first frame from the original video clip 
-        cap_temp = cv2.VideoCapture("/home/ubuntu/Automatic-Video-Colorization/data/Moments_processed/color" + inputname[2:])
-        #cap_temp = cv2.VideoCapture("/home/ubuntu/Automatic-Video-Colorization/data/examples/converted/color" + inputname[2:])
+        #cap_temp = cv2.VideoCapture("/home/ubuntu/Automatic-Video-Colorization/data/Moments_processed/color" + inputname[2:])
+        cap_temp = cv2.VideoCapture("/home/ubuntu/Automatic-Video-Colorization/data/examples/converted/color" + inputname[2:])
         ret, frame_prev = cap_temp.read()
         size = 256
         # convert BGR to RGB convention
