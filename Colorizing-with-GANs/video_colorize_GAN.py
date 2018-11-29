@@ -60,12 +60,15 @@ def bw2color(options, inputname, inputpath, outputpath):
             isColor=True
         )
         
-        # TO CHANGE pick the first frame from the original video clip 
+        # TO CHANGE to DL colorization of 1st frame
+        # pick the first frame from the original video clip as the first reference
         cap_temp = cv2.VideoCapture(os.path.join(inputpath, "color" + inputname[2:]))
+        
         #ret_temp, frame_prev = cap_temp.read()
         # convert BGR to RGB convention
         #frame_prev = frame_prev[:,:,::-1]
         #frame_prev = cv2.resize(frame_prev, (size, size)) 
+        
         # count the number of recolorized frames
         frames_processed = 0
 
