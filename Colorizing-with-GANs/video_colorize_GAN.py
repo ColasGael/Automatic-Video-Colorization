@@ -51,7 +51,7 @@ def bw2color(options, inputname, inputpath, outputpath):
     
         # recolorized output video
         color_out = cv2.VideoWriter(
-            outputpath + 'color_' + inputname,
+            os.path.join(outputpath, 'color_' + inputname),
             fourcc,
             fps,
             (new_width, new_height),
