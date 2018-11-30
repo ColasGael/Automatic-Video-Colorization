@@ -44,14 +44,9 @@ def split_resize_and_save(filename, i, output_dir, dt=1, size=SIZE):
                 
     vidcap = cv2.VideoCapture(filename)
     
-    success, frame = vidcap.read()
-    # convert BGR to RGB convention
-    frame = frame[:,:,::-1]
-    # default : use bilinear interpolation
-    frame_prev = cv2.resize(frame, (size, size)) 
-    
+    success = True
     # counter to build pairs of consecutive frames
-    count = 1
+    count = 0
     
     while success:
       count += 1
@@ -61,11 +56,12 @@ def split_resize_and_save(filename, i, output_dir, dt=1, size=SIZE):
       if success:
           # convert BGR to RGB convention
           frame = frame[:,:,::-1]
+          # default : use bilinear interpolation
           frame = cv2.resize(frame, (size, size)) 
           
       #print('Read a new frame: ', success)
             
-      if count % (1+dt) == 0 and count != 0:
+      if count % (1+dt) == 0:
           img = np.concatenate((frame, frame_prev), 2)
           frame_prev = frame     
           count = 0
