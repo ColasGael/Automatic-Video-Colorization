@@ -65,7 +65,7 @@ def split_resize_and_save(filename, i, output_dir, dt=1, size=SIZE):
           
       #print('Read a new frame: ', success)
             
-      if count % (1+dt) ==0:
+      if count % (1+dt) == 0:
           img = np.concatenate((frame, frame_prev), 2)
           frame_prev = frame     
           count = 0
@@ -118,6 +118,6 @@ if __name__ == '__main__':
 
         print("Processing {} data, saving preprocessed data to {}".format(split, output_dir_split))
         for i, filename in enumerate(tqdm(filenames[split])):
-            split_resize_and_save(filename, i, output_dir_split, size=SIZE)
+            split_resize_and_save(filename, i, output_dir_split, dt=args.dt, size=SIZE)
 
     print("Done building dataset")
