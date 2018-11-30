@@ -30,6 +30,9 @@ def main(options):
         
         elif options.dataset == MOMENTSINTIME_DATASET:
             model = MomentsInTimeModel(sess, options)
+        
+        else:
+            model = MomentsInTimeModel(sess, options)
 
         if not os.path.exists(options.checkpoints_path):
             os.makedirs(options.checkpoints_path)
