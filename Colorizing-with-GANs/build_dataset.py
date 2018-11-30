@@ -65,7 +65,7 @@ def split_resize_and_save(filename, i, output_dir, dt=1, size=SIZE):
           
       #print('Read a new frame: ', success)
             
-      if count % (1+dt) == 0:
+      if count % (1+dt) == 0 and count != 0:
           img = np.concatenate((frame, frame_prev), 2)
           frame_prev = frame     
           count = 0
