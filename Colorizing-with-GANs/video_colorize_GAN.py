@@ -86,12 +86,12 @@ def bw2color(options, inputname, inputpath, outputpath):
             while(cap.isOpened()):
                 ret, frame_in = cap.read()
                 
-                ret_temp, frame_prev = cap_temp.read()
+                #ret_temp, frame_prev = cap_temp.read()
                 
                 # check if we are not at the end of the video
                 if ret==True:      
-                    frame_prev = frame_prev[:,:,::-1]
-                    frame_prev = cv2.resize(frame_prev, (size, size))
+                    #frame_prev = frame_prev[:,:,::-1]
+                    #frame_prev = cv2.resize(frame_prev, (size, size))
                     
                     # convert BGR to RGB convention
                     frame_in = frame_in[:,:,::-1]
