@@ -48,7 +48,7 @@ def split_resize_and_save(filename, i, output_dir, dt=1, size=SIZE):
     # convert BGR to RGB convention
     frame = frame[:,:,::-1]
     # default : use bilinear interpolation
-    frame = cv2.resize(frame, (size, size)) 
+    frame_prev = cv2.resize(frame, (size, size)) 
     
     # counter to build pairs of consecutive frames
     count = 1
