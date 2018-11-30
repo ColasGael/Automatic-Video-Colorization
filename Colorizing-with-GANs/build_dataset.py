@@ -36,7 +36,7 @@ SUBFOLDER = "/baking"
 parser = argparse.ArgumentParser()
 parser.add_argument('--data_dir', default='../data/Moments_in_Time_Mini', help="Directory with the Moments in Time dataset")
 parser.add_argument('--output_dir', default='../data/momentsintime', help="Where to write the new data")
-parser.add_argument('--dt', default=1, help="Time between consecutives frames")
+parser.add_argument('--dt', type=int, default=1, help="Time between consecutives frames")
 
 
 def split_resize_and_save(filename, i, output_dir, dt=1, size=SIZE):
