@@ -132,10 +132,10 @@ class MomentsInTimeDataset(BaseDataset):
 
     def load(self):
         if self.training:
-            #data = np.array(glob.glob("/home/ubuntu/**/" + self.path + '/train_moments/*', recursive=True))
-            data = np.array(glob.glob("/home/ubuntu/Automatic-Video-Colorization/data/momentsintime/train_moments/*"))
+            #data = np.array(glob.glob("/home/ubuntu/Automatic-Video-Colorization/data/momentsintime/train_moments/*"))
+            data = np.array(glob.glob("." + self.path + "/train_moments/*"))
         else:
-            #data = np.array(glob.glob("/home/ubuntu/**/" + self.path + '/dev_moments/*', recursive=True))
-            data = np.array(glob.glob("/home/ubuntu/Automatic-Video-Colorization/data/momentsintime/dev_moments/*"))
+            #data = np.array(glob.glob("/home/ubuntu/Automatic-Video-Colorization/data/momentsintime/dev_moments/*"))
+            data = np.array(glob.glob("." + self.path + "/dev_moments/*"))
 
         return data
