@@ -85,9 +85,14 @@ def bw2color(options, inputname, inputpath, outputpath):
 
             while(cap.isOpened()):
                 ret, frame_in = cap.read()
-                                
+                
+                #ret_temp, frame_prev = cap_temp.read()
+                
                 # check if we are not at the end of the video
-                if ret==True:                          
+                if ret==True:      
+                    #frame_prev = frame_prev[:,:,::-1]
+                    #frame_prev = cv2.resize(frame_prev, (size, size))
+                    
                     # convert BGR to RGB convention
                     frame_in = frame_in[:,:,::-1]
                     # resize the frame to match the input size of the GAN
@@ -108,11 +113,12 @@ def bw2color(options, inputname, inputpath, outputpath):
                         img.save(os.path.join(model.samples_dir, sample))
 
                     # save the recolorized frame
-                    frame_prev = frame_out
+                    #frame_prev = frame_out
                     # convert RGB to BGR convention
                     frame_out = frame_out[:,:,::-1]
                     # write the color frame
                     color_out.write(frame_out)
+                    #break                
                     
                     # print progress
                     frames_processed += 1
