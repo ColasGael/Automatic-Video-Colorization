@@ -36,42 +36,45 @@ SUBFOLDER = "/baking"
 parser = argparse.ArgumentParser()
 parser.add_argument('--data_dir', default='../data/Moments_in_Time_Mini', help="Directory with the Moments in Time dataset")
 parser.add_argument('--output_dir', default='../data/momentsintime', help="Where to write the new data")
+parser.add_argument('--dt', default=1, help="Time between consecutives frames")
 
 
-def split_resize_and_save(filename, i, output_dir, size=SIZE):
-    """Split the video clip in pair of consecutive frames, resize the frames, and save the pairs to the `output_dir`"""
- 
-    # counter to build pairs of consecutive frames
-    count = 0
+def split_resize_and_save(filename, i, output_dir, dt=1, size=SIZE):
+    """Split the video clip in pair of consecutive frames (t, t+dt), resize the frames, and save the pairs to the `output_dir`"""
                 
     vidcap = cv2.VideoCapture(filename)
     
     success, frame = vidcap.read()
-    # default : use bilinear interpolation
     # convert BGR to RGB convention
     frame = frame[:,:,::-1]
+    # default : use bilinear interpolation
     frame = cv2.resize(frame, (size, size)) 
     
-    while success:
+    # counter to build pairs of consecutive frames
+    count = 1
     
-      frame_prev = frame     
+    while success:
+      count += 1
+      
       success, frame = vidcap.read()
       
       if success:
           # convert BGR to RGB convention
           frame = frame[:,:,::-1]
           frame = cv2.resize(frame, (size, size)) 
-          img = np.concatenate((frame, frame_prev), 2)
           
       #print('Read a new frame: ', success)
             
-      if count % 2 ==0:
+      if count % (1+dt) ==0:
+          img = np.concatenate((frame, frame_prev), 2)
+          frame_prev = frame     
+          count = 0
           np.save(output_dir + "/video{}_frame{}".format(i, count), img)
           
-      count += 1
-
 if __name__ == '__main__':
     args = parser.parse_args()
+    # Define the output directory
+    args.output_dir = args.output_dir + "_dt" + str(args.dt)
     
     assert os.path.isdir(args.data_dir), "Couldn't find the dataset at {}".format(args.data_dir)
 
