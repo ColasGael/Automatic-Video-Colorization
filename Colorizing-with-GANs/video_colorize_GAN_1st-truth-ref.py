@@ -64,6 +64,11 @@ def bw2color(options, inputname, inputpath, outputpath):
         # pick the first frame from the original video clip as the first reference
         cap_temp = cv2.VideoCapture(os.path.join(inputpath, "color" + inputname[2:]))
         
+        ret_temp, frame_prev = cap_temp.read()
+        # convert BGR to RGB convention
+        frame_prev = frame_prev[:,:,::-1]
+        frame_prev = cv2.resize(frame_prev, (size, size)) 
+        
         # count the number of recolorized frames
         frames_processed = 0
 
@@ -80,14 +85,9 @@ def bw2color(options, inputname, inputpath, outputpath):
 
             while(cap.isOpened()):
                 ret, frame_in = cap.read()
-                
-                ret_temp, frame_prev = cap_temp.read()
-                
+                                
                 # check if we are not at the end of the video
                 if ret==True:      
-                    frame_prev = frame_prev[:,:,::-1]
-                    frame_prev = cv2.resize(frame_prev, (size, size))
-                    
                     # convert BGR to RGB convention
                     frame_in = frame_in[:,:,::-1]
                     # resize the frame to match the input size of the GAN
