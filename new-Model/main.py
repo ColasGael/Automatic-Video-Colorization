@@ -26,7 +26,7 @@ def main(options):
         elif options.dataset == PLACES365_DATASET:
             model = Places365Model(sess, options)
         
-        elif options.dataset == MOMENTSINTIME_DATASET:
+        elif MOMENTSINTIME_DATASET in options.dataset:
             model = MomentsInTimeModel(sess, options)
         
         else:
