@@ -16,10 +16,10 @@ from options import ModelOptions
 from models import MomentsInTimeModel
 
     
-def image_colorization_propagation(model, img_bw_in, img_rgb_prev, options):
+def image_colorization_propagation(model, img_bw_in, img_rgb_prev, img_rgb_first, options):
 
     # colorize the image based on the previous one
-    feed_dic = {model.input_rgb: np.expand_dims(img_bw_in, axis=0), model.input_rgb_prev: np.expand_dims(img_rgb_prev, axis=0)}
+    feed_dic = {model.input_rgb: np.expand_dims(img_bw_in, axis=0), model.input_rgb_prev: np.expand_dims(img_rgb_prev, axis=0), model.input_rgb_first: img_rgb_first}
     fake_image, _ = model.sess.run([model.sampler, model.input_gray], feed_dict=feed_dic)
     fake_image = postprocess(tf.convert_to_tensor(fake_image), colorspace_in=options.color_space, colorspace_out=COLORSPACE_RGB)
     
@@ -68,6 +68,8 @@ def bw2color(options, inputname, inputpath, outputpath):
         # convert BGR to RGB convention
         frame_prev = frame_prev[:,:,::-1]
         frame_prev = cv2.resize(frame_prev, (size, size)) 
+        # save the first frame as the reference
+        frame_ref = frame_prev
         
         # count the number of recolorized frames
         frames_processed = 0
@@ -94,7 +96,7 @@ def bw2color(options, inputname, inputpath, outputpath):
                     frame_in = cv2.resize(frame_in, (size, size))
 
                     # colorize the BW frame
-                    frame_out = image_colorization_propagation(model, frame_in, frame_prev, options)
+                    frame_out = image_colorization_propagation(model, frame_in, frame_prev, frame_ref, options)
                     
                     #generate sample
                     get_image = False
