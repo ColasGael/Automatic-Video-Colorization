@@ -7,7 +7,7 @@ from utils import unpickle
 
 CIFAR10_DATASET = 'cifar10'
 PLACES365_DATASET = 'places365'
-MOMENTSINTIME_DATASET = 'momentsintime_ref'
+MOMENTSINTIME_DATASET = 'momentsintime'
 
 class BaseDataset():
     def __init__(self, name, path, training=True, augment=True):
@@ -132,8 +132,10 @@ class MomentsInTimeDataset(BaseDataset):
 
     def load(self):
         if self.training:
+            #data = np.array(glob.glob("/home/ubuntu/Automatic-Video-Colorization/data/momentsintime/train_moments/*"))
             data = np.array(glob.glob("." + self.path + "/train_moments/*"))
         else:
+            #data = np.array(glob.glob("/home/ubuntu/Automatic-Video-Colorization/data/momentsintime/dev_moments/*"))
             data = np.array(glob.glob("." + self.path + "/dev_moments/*"))
 
         return data
