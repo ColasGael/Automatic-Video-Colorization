@@ -19,7 +19,7 @@ from models import MomentsInTimeModel
 def image_colorization_propagation(model, img_bw_in, img_rgb_prev, img_rgb_first, options):
 
     # colorize the image based on the previous one
-    feed_dic = {model.input_rgb: np.expand_dims(img_bw_in, axis=0), model.input_rgb_prev: np.expand_dims(img_rgb_prev, axis=0), model.input_rgb_first: img_rgb_first}
+    feed_dic = {model.input_rgb: np.expand_dims(img_bw_in, axis=0), model.input_rgb_prev: np.expand_dims(img_rgb_prev, axis=0), model.input_rgb_first: np.expand_dims(img_rgb_first, axis=0)}
     fake_image, _ = model.sess.run([model.sampler, model.input_gray], feed_dict=feed_dic)
     fake_image = postprocess(tf.convert_to_tensor(fake_image), colorspace_in=options.color_space, colorspace_out=COLORSPACE_RGB)
     
