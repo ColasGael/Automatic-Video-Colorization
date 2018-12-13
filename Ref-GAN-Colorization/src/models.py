@@ -49,7 +49,7 @@ class BaseModel:
             
             for input_rgb in generator:
                 # OLD : feed_dict = {self.input_rgb: input_rgb}
-                feed_dic = {self.input_rgb: input_rgb[:,:,:,0:3], self.input_rgb_prev: input_rgb[:,:,:,3:6]}
+                feed_dic = {self.input_rgb: input_rgb[:,:,:,0:3], self.input_rgb_prev: input_rgb[:,:,:,3:6], self.input_rgb_first: input_rgb[:,:,:,6:9]}
 
                 self.iteration = self.iteration + 1
                 self.sess.run([self.dis_train], feed_dict=feed_dic)
@@ -104,7 +104,7 @@ class BaseModel:
 
         for input_rgb in test_generator:
             # OLD : feed_dic = {self.input_rgb: input_rgb}
-            feed_dic = {self.input_rgb: input_rgb[:,:,:,0:3], self.input_rgb_prev: input_rgb[:,:,:,3:6]}
+            feed_dic = {self.input_rgb: input_rgb[:,:,:,0:3], self.input_rgb_prev: input_rgb[:,:,:,3:6], self.input_rgb_first: input_rgb[:,:,:,6:9]}
 
             self.sess.run([self.dis_loss, self.gen_loss, self.accuracy], feed_dict=feed_dic)
 
@@ -130,7 +130,7 @@ class BaseModel:
         input_rgb = next(self.sample_generator)
         
         # OLD : feed_dic = {self.input_rgb: input_rgb}
-        feed_dic = {self.input_rgb: input_rgb[:,:,:,0:3], self.input_rgb_prev: input_rgb[:,:,:,3:6]}
+        feed_dic = {self.input_rgb: input_rgb[:,:,:,0:3], self.input_rgb_prev: input_rgb[:,:,:,3:6], self.input_rgb_first: input_rgb[:,:,:,6:9]}
 
         step, rate = self.sess.run([self.global_step, self.learning_rate])
         fake_image, input_gray = self.sess.run([self.sampler, self.input_gray], feed_dict=feed_dic)
@@ -160,7 +160,7 @@ class BaseModel:
             input_rgb = next(gen)
             
             # OLD : feed_dic = {self.input_rgb: input_rgb}
-            feed_dic = {self.input_rgb: input_rgb[:,:,:,0:3], self.input_rgb_prev: input_rgb[:,:,:,3:6]}
+            feed_dic = {self.input_rgb: input_rgb[:,:,:,0:3], self.input_rgb_prev: input_rgb[:,:,:,3:6], self.input_rgb_first: input_rgb[:,:,:,6:9]}
             fake_image = self.sess.run(self.sampler, feed_dict=feed_dic)
             fake_image = postprocess(tf.convert_to_tensor(fake_image), colorspace_in=self.options.color_space, colorspace_out=COLORSPACE_RGB)
 
@@ -184,12 +184,15 @@ class BaseModel:
 
         self.input_rgb = tf.placeholder(tf.float32, shape=(None, None, None, 3), name='input_rgb')
         self.input_rgb_prev = tf.placeholder(tf.float32, shape=(None, None, None, 3), name='input_rgb_prev')
+        self.input_rgb_first = tf.placeholder(tf.float32, shape=(None, None, None, 3), name='input_rgb_first')
 
         self.input_gray = tf.image.rgb_to_grayscale(self.input_rgb)
         self.input_color = preprocess(self.input_rgb, colorspace_in=COLORSPACE_RGB, colorspace_out=self.options.color_space)
         self.input_color_prev = preprocess(self.input_rgb_prev, colorspace_in=COLORSPACE_RGB, colorspace_out=self.options.color_space)
+        self.input_color_first = preprocess(self.input_rgb_first, colorspace_in=COLORSPACE_RGB, colorspace_out=self.options.color_space)
 
-        gen = gen_factory.create(tf.concat([self.input_gray, self.input_color_prev],3), kernel, seed)
+
+        gen = gen_factory.create(tf.concat([self.input_gray, self.input_color_prev, self.input_color_first],3), kernel, seed)
         dis_real = dis_factory.create(tf.concat([self.input_color, self.input_color_prev], 3), kernel, seed)
         dis_fake = dis_factory.create(tf.concat([gen, self.input_color_prev], 3), kernel, seed, reuse_variables=True)
 
@@ -207,7 +210,7 @@ class BaseModel:
 
         self.gen_loss = self.gen_loss_gan + self.gen_loss_l1
 
-        self.sampler = gen_factory.create(tf.concat([self.input_gray, self.input_color_prev],3), kernel, seed, reuse_variables=True)
+        self.sampler = gen_factory.create(tf.concat([self.input_gray, self.input_color_prev, self.input_color_first],3), kernel, seed, reuse_variables=True)
         self.accuracy = pixelwise_accuracy(self.input_color, gen, self.options.color_space, self.options.acc_thresh)
         self.learning_rate = tf.constant(self.options.lr)
 
