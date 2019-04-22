@@ -36,11 +36,13 @@ Pre-process the dataset
 ```
 
 ## Running the baseline on a specific video
+Go into the folder "Deep-Learning-Colorization"
+
 Run ```./models/fetch_release_models.sh``` to download the model.
 
 Then run the following command to colorize your video :
 ```
-python3 video_colorize_image_parallel.py --filename <BW_video_filename> --input_dir <path_to_input_directory> --output_dir <path_to_output_directory>
+python3 video_colorize_parallel.py --filename <BW_video_filename> --input_dir <path_to_input_directory> --output_dir <path_to_output_directory>
 ```
 
 ### Requirements
